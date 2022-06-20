@@ -1,14 +1,14 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { Text, View, TouchableOpacity, StyleSheet, TextInput ,Button, Image} from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet, TextInput, Button, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import RNFS from 'react-native-fs';
 
 const Chat = ({ navigation }) => {
     const [conversationMessage, setConversationMessage] = useState(null)
-    const userToken = 'xoxp-3648565925605-3651406447987-3688212663504-e228377677a364f3ce296e6488bf6295'
+    const userToken = 'xoxp-3648565925605-3651406447987-3703989459873-78420bd9825200036d627984e394d567 '
     const conversationName = '1-2-test'
-    
-    
+
     //pick
     const [image, setImage] = useState("hello");
     const pickImage = async () => {
@@ -18,30 +18,34 @@ const Chat = ({ navigation }) => {
             aspect: [4, 6],
             quality: 1,
         });
-        setConversationMessage({...result,name:'hello'})
 
-        setImage(result.uri);        
+
+        setImage(result.uri);
+        setConversationMessage({ ...result, name: 'file' })
     };
-   
-    const postMessageToChannel = async (conversationMessage) => {
-       let file = conversationMessage
-       console.log('file',file)
-        const data = new FormData();
-       data.append({
-        name: file.name,
-        type: file.type,
-        uri:image
-       });
-       console.log('===>',data["_parts"][0]);
 
-        await axios.post('https://slack.com/api/files.upload',data["_parts"][0] , {
-            
-        headers:{"Content-type": "multipart/form-data", "charset" :"utf-8", "Authorization" : `Bearer ${userToken}`},
-        channel: conversationName 
+    const postMessageToChannel = async (conversationMessage) => {
+        let photo = conversationMessage
+        console.log('photo', photo)
+        var base64 = await RNFS.readFile( photo.uri, 'base64');
+
+        console.log('base64')
+        console.log(base64)
+        const data = new FormData();
+        data.append({
+            channels: 'C03JZB8CCR5',            
+            initial_comment: "Here\'s my file :smile:",
+            file: base64
+        });
+
+       await axios.post('https://slack.com/api/files.upload', data, {
         
-       
-    })
-    .then((response) => {
+           // file: data,
+            headers: { "Content-type": "multipart/form-data", "charset": "utf-8", "Authorization": `Bearer ${userToken}` },
+   
+
+        })
+            .then((response) => {
                 console.log('*********************response******************** \n', response.data);
                 return response.data
             },
@@ -49,26 +53,38 @@ const Chat = ({ navigation }) => {
                     console.log('*********************error******************** \n', err);
                     return err
                 })
-}
+            .then((responseJson) => {
+                alert(JSON.stringify(responseJson));
+                console.log(responseJson);
+            })
+            .catch((error) => {
+                alert(JSON.stringify(error));
+                console.error(error);
+            });
+    }
+ 
 
-return (
-    <View style={styles.container}>
-        
-        <Button title="Pick an image from camera roll" onPress={pickImage}  />
-        <Image 
-            source={{ uri: image }} style={{ width: 300, height: 300 }} />
-        {/* <TextInput
-            onChange={image => setConversationMessage(image)}
-            value={conversationMessage}
-            //style={styles.input}
-        /> */}
-        
-        <TouchableOpacity onPress={() => postMessageToChannel(conversationMessage)} style={styles.button}>
-            <Text style={styles.buttonText}> Post Image to Conversation</Text>
-        </TouchableOpacity>
-      
-    </View>
-); 
+    return (
+        <View style={styles.container}>
+
+            <Button title="Pick an image from camera roll" onPress={pickImage} />
+            <Image
+                source={{ uri: image }} style={{ width: 300, height: 300 }}
+                onChange={file => setConversationMessage(file)}
+                value={conversationMessage}
+            />
+            {/* <TextInput
+onChange={file => setConversationMessage(file)}
+value={conversationMessage}
+            
+/>*/ }
+
+            <TouchableOpacity onPress={() => postMessageToChannel(conversationMessage)} style={styles.button}>
+                <Text style={styles.buttonText}> Post Image to Conversation</Text>
+            </TouchableOpacity>
+
+        </View>
+    );
 }
 const styles = StyleSheet.create({
     container: {
