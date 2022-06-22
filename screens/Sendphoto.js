@@ -96,30 +96,3 @@ export default Caamera;
 
 
 
-/*
-//slack
-const createConversation = () => {
-    fetch('https://slack.com/api/conversations.create?token=' + userToken + '&name=' + conversationName + '&pretty=1')
-        .then((response) => response.json())
-        .then((responseJson) => {
-            alert(JSON.stringify(responseJson));
-            console.log(responseJson);
-        })
-        .catch((error) => {
-            alert(JSON.stringify(error));
-            console.error(error);
-        });
-}
-const postMessageToChannel = () => {
-    fetch('https://app.slack.com/client/T03K2GMT7HT/D03JQRM1GUX=' + userToken + '&channel=' + conversationName + '&text=' + conversationMessage + '&pretty=1')
-    .then((response) => response.json())
-    .then((responseJson) => {
-        alert(JSON.stringify(responseJson));
-        console.log(responseJson);
-    })
-    .catch((error) => {
-        alert(JSON.stringify(error));
-        console.error(error);
-    });
-}
-*/
