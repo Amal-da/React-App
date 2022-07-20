@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, Button, TouchableOpacity, View, SafeAreaView, Image, Alert, TextInput } from 'react-native';
+import { Text, Button, TouchableOpacity, View, SafeAreaView, Image, useColorScheme, TextInput } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { shareAsync } from 'expo-sharing';
 import styles from "../styles";
-import Chat from './chat';
-
+import { Feather } from '@expo/vector-icons';
+import reusable from '../reusable';
 
 const Caamera = ({ navigation }) => {
+    //mode 
+    const colorScheme = useColorScheme();
+    const themeContainerStyle =
+        colorScheme === 'light' ? styles.lightContainer : styles.darkContainer;
     let cameraRef = useRef();
     const [hasPermission, setHasPermission] = useState(null);// useEffect bech tekhou l permission //useState bech taaref aamal allow wala lew menou taaref taatih l'acces wala le
     //variable lel state esmou hasPermission w setHasPermission fct leha ; useState(null); athika hya par defaut kifeh
@@ -56,15 +60,25 @@ const Caamera = ({ navigation }) => {
                 setPhoto(undefined);
             });
         };
-        
-        return (
-            <SafeAreaView style={styles.container}>
-                <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64 }} />
-                <Button title="  Share  " onPress={sharePic} />
 
-                {hasMediaLibraryPermission ? <Button title="   Save    " onPress={savePhoto} /> : undefined}
-                <Button title="Go back" onPress={() => setPhoto(undefined)} />
-                <Button title="Go Chat"   onPress={() => navigation.navigate('Chat')} />
+
+        return (
+            <SafeAreaView style={[styles.container, themeContainerStyle]}>
+
+                <Feather name="arrow-left-circle" style={styles.backk} onPress={() => setPhoto(undefined)} />
+
+                <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64 }} />
+
+                <TouchableOpacity onPress={() => sharePic()} style={reusable.button('nini')}>
+                    <Text style={styles.TextVV}>      Share   </Text>
+                    <Feather name="share" size={24} color="#2C3639" />
+                </TouchableOpacity>
+
+                {hasMediaLibraryPermission ? <TouchableOpacity onPress={savePhoto} style={reusable.button('nini')}>
+                    <Text style={styles.TextVV}>       Save   </Text>
+                    <Feather name="save" size={24} color="#2C3639" />
+                </TouchableOpacity> : undefined}
+
 
             </SafeAreaView>
             //
@@ -74,17 +88,20 @@ const Caamera = ({ navigation }) => {
     return (
         <View style={{ flex: 1, display: 'flex' }}>
             <Camera style={styles.camera} type={type} ref={cameraRef}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        setType(type === CameraType.back ? CameraType.front : CameraType.back);
+                    }}>
+                    <Text style={styles.text}> Flip </Text>
+                    <MaterialIcons name="flip-camera-android" size={30} color="#F4BBBB" />
+                </TouchableOpacity>
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            setType(type === CameraType.back ? CameraType.front : CameraType.back);
-                        }}>
-                        <Text style={styles.text}> Flip </Text>
-                        <MaterialIcons name="flip-camera-android" size={30} color="#371B58" />
-                    </TouchableOpacity>
-                    <View  >
-                        <FontAwesome5 name="camera" size={40} color="#CA82FF" onPress={takePic} />
+                </View>
+
+                <View style={styles.circle}>
+                    <View style={styles.icon}>
+                        <FontAwesome5 name="camera" size={50} color="white" onPress={takePic} />
                     </View>
                 </View>
             </Camera>

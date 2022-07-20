@@ -43,17 +43,12 @@ const Pick = ({ navigation }) => {
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
-           // allowsEditing: true,
-            aspect: [4
-                , 6],
+            aspect: [4, 6],
             quality: 1,
         });
-
         console.log(result);
+        setImage(result.uri);
 
-       
-            setImage(result.uri);
-        
     };
 
     return (
